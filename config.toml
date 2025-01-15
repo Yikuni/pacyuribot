@@ -1,0 +1,3 @@
+[server]
+debug = true
+port = 2514
