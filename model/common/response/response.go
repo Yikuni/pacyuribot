@@ -50,7 +50,9 @@ func FailWithMessage(message string, c *gin.Context) {
 }
 
 func NoAuth(c *gin.Context) {
-	Result(ERROR, nil, "Unauthorized", c)
+	c.JSON(http.StatusNonAuthoritativeInfo, Response{
+		ERROR, nil, "Unauthorized",
+	})
 }
 
 func FailWithDetailed(data interface{}, message string, c *gin.Context) {

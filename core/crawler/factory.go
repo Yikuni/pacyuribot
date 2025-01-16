@@ -2,7 +2,7 @@ package crawler
 
 import "pacyuribot/model/admin/request"
 
-func GetDefaultCrawler(config request.DefaultCrawlerConfig) Crawler {
+func GetDefaultCrawler(config request.DefaultCrawlerConfig, id string) Crawler {
 	crawler := NewDefaultCrawler()
 	crawler.
 		AddContentFilter(GetTitleFilter(config.MaxLengthC, config.MaxLengthE), 8).

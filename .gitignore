@@ -1,5 +1,10 @@
 cache/
+config.toml
+data/
+
+
 .DS_Store
+
 
 # local env files
 .env.local

@@ -16,6 +16,10 @@ func main() {
 	logger.DEBUG = global.Config.Server.Debug
 	logger.Info("Loaded config")
 
+	// 初始化
+	initialize.InitializeCron()
+	initialize.InitPocketbase()
+
 	// 创建 Gin 路由
 	r := initialize.Routers()
 
@@ -24,16 +28,4 @@ func main() {
 	if err != nil {
 		return
 	}
-}
-
-func test() {
-	//crawler.GetDefaultCrawler(crawler.DefaultCrawlerConfig{
-	//	TitleFilter:     true,
-	//	MaxLengthC:      10,
-	//	MaxLengthE:      18,
-	//	AllowOrigins:    []string{"person.zju.edu.cn", "localhost"},
-	//	DisAllowOrigins: []string{},
-	//}).Run([]string{"https://person.zju.edu.cn/zhaohui"})
-	// 创建一个上下文
-
 }

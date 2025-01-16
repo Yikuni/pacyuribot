@@ -1,0 +1,5 @@
+# Rename this file to "config.toml"
+[server]
+debug = true
+port = 2514
+pocketbase = "http://localhost:8090"

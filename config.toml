@@ -1,3 +1,8 @@
 [server]
 debug = true
 port = 2514
+
+[pocketbase]
+url = "https://pocketbase.yikuni.com"
+email = "yikuni@qq.com"
+password = "yikuniYikuni233"
