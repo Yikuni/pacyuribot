@@ -11,7 +11,13 @@ func InitPocketbase() {
 		global.Config.Pocketbase.Url,
 		pocketbase.WithAdminEmailPassword(global.Config.Pocketbase.Email, global.Config.Pocketbase.Password),
 	)
-	_, err := global.Cron.AddFunc("0 0 * * *", RefreshAdminToken)
+	err := global.PocketbaseAdminClient.Authorize()
+	if err != nil {
+		logger.Error("Failed to login Pocketbase")
+		panic(err.Error())
+		return
+	}
+	_, err = global.Cron.AddFunc("0 0 * * *", RefreshAdminToken)
 	if err != nil {
 		logger.Error("Failed to add function to Cron: %s", err.Error())
 		panic(err.Error())

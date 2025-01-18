@@ -1,7 +1,7 @@
 cache/
 config.toml
 data/
-
+test/
 
 .DS_Store
 

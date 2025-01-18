@@ -14,6 +14,6 @@ func Auth() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		c.Set("id", id)
+		c.Set("userID", id)
 	}
 }

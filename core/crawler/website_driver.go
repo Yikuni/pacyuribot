@@ -15,16 +15,6 @@ import (
 type VisitWebsiteCallback func()
 
 func VisitWebsite(url string, c *colly.Collector, callback VisitWebsiteCallback) {
-	// 保证cache文件夹存在
-	_, err := os.Stat("cache")
-	if os.IsNotExist(err) {
-		// 如果不存在，创建文件夹
-		err = os.Mkdir("cache", os.ModePerm)
-		if err != nil {
-			panic(err)
-		}
-	}
-
 	filePath := "cache/" + uuid.New().String() + ".html"
 	ctx, cancel := chromedp.NewContext(context.Background())
 	defer cancel()
@@ -37,7 +27,7 @@ func VisitWebsite(url string, c *colly.Collector, callback VisitWebsiteCallback)
 	var htmlContent string
 
 	// 启动任务
-	err = chromedp.Run(ctx,
+	err := chromedp.Run(ctx,
 		chromedp.Navigate(url),                         // 替换为目标URL
 		chromedp.WaitVisible(`body`, chromedp.ByQuery), // 等待页面加载完成
 		chromedp.OuterHTML("html", &htmlContent),       // 获取完整HTML内容
