@@ -32,7 +32,7 @@ func (s *CrawlerService) CreateCrawlData(owner string, dataSource string, target
 			Owner:      owner,
 			DataSource: dataSource,
 			TargetURL:  targetURL,
-			Activated:  true,
+			Deleted:    false,
 		},
 	)
 	if err != nil {
