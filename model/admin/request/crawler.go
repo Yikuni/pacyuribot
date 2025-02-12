@@ -27,5 +27,5 @@ type CrawlData struct {
 	DataSource string `json:"data_source"`
 	TargetURL  string `json:"target_url"`
 	Modified   bool   `json:"modified"`
-	Activated  bool   `json:"activated"`
+	Deleted    bool   `json:"deleted"`
 }
