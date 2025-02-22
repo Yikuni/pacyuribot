@@ -3,7 +3,7 @@ package middleware
 import (
 	"github.com/gin-gonic/gin"
 	"pacyuribot/model/common/response"
-	utils "pacyuribot/utils/pocketbase"
+	"pacyuribot/utils"
 )
 
 func Auth() gin.HandlerFunc {
