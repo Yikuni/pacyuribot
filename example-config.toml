@@ -2,4 +2,15 @@
 [server]
 debug = true
 port = 2514
-pocketbase = "http://localhost:8090"
+
+[pocketbase]
+url = "https://pocketbase.example.com"
+email = "admin@example.com"
+password = "password"
+
+[chatgpt]
+key = "sk-example"
+url = "https://api.openai.com"
+proxy = "http://localhost:7890"
+instruction = "请根据文件内容回答下面的问题"
+

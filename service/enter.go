@@ -1,9 +1,13 @@
 package service
 
-import "pacyuribot/service/admin"
+import (
+	"pacyuribot/service/admin"
+	"pacyuribot/service/assistant"
+)
 
 var ServiceGroupApp = new(ServiceGroup)
 
 type ServiceGroup struct {
-	AdminServiceGroup admin.AdminServiceGroup
+	AdminServiceGroup     admin.AdminServiceGroup
+	AssistantServiceGroup assistant.AssistantServiceGroup
 }

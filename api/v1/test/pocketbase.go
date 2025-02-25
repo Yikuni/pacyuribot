@@ -7,7 +7,7 @@ import (
 	"pacyuribot/global"
 	"pacyuribot/logger"
 	"pacyuribot/model/common/response"
-	utils "pacyuribot/utils/pocketbase"
+	"pacyuribot/utils"
 )
 
 type PocketBaseAPI struct {

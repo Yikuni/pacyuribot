@@ -12,20 +12,9 @@ type DefaultCrawlerConfig struct {
 	AllowExternalLink    bool     `json:"allow_external_link"`
 }
 
-type CrawlerTaskStatus struct {
-}
 type CrawlTask struct {
 	Owner      string               `json:"owner"`
 	DataSource string               `json:"data_source"`
 	Completed  bool                 `json:"completed"`
 	Config     DefaultCrawlerConfig `json:"config"`
-}
-
-// CrawlData 文件直接保存在/data/crawl/:id
-type CrawlData struct {
-	Owner      string `json:"owner"`
-	DataSource string `json:"data_source"`
-	TargetURL  string `json:"target_url"`
-	Modified   bool   `json:"modified"`
-	Deleted    bool   `json:"deleted"`
 }

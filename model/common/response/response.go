@@ -3,6 +3,7 @@ package response
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"pacyuribot/logger"
 )
 
 type Response struct {
@@ -47,6 +48,7 @@ func Fail(c *gin.Context) {
 
 func FailWithMessage(message string, c *gin.Context) {
 	Result(ERROR, map[string]interface{}{}, message, c)
+	logger.Error(message)
 }
 
 func NoAuth(c *gin.Context) {

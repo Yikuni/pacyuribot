@@ -1,11 +1,11 @@
 package assistant
 
-type Assistant interface {
-	CreateAssistant(name string, vectorStores *[]string) (string, error)
-	ModifyAssistant(assistantID string, vectorStores *[]string) error
-	UploadFile(path string, vectorStore string) (string, error)
+type AssistantService interface {
+	CreateAssistant(name string, vectorStores []string) (string, error)
+	ModifyAssistant(assistantID string, vectorStores []string) error
+	UploadFile(path string, name string) (string, error)
 	DeleteFile(fileID string) error
 
-	CreateVectorStore(fileIDList *[]string) (string, error)
+	CreateVectorStore(name string, fileIDList []string) (string, error)
 	DeleteVectorStore(vectorStoreID string) error
 }

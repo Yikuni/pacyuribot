@@ -4,6 +4,7 @@ import (
 	"os"
 	"pacyuribot/logger"
 	"pacyuribot/service"
+	"pacyuribot/utils"
 )
 
 type PageCrawledCallback func(d *DefaultCrawler) bool
@@ -21,12 +22,12 @@ func DebugPageCraw(d *DefaultCrawler) bool {
 func GetAddCrawlDataCallback(owner string, datasource string) PageCrawledCallback {
 	return func(d *DefaultCrawler) bool {
 
-		dataID, err := s.CreateCrawlData(owner, datasource, d.ctx.currentURL.String())
+		dataID, err := s.CreateCrawlData(owner, datasource, d.ctx.currentURL.String(), "txt")
 		if err != nil {
 			logger.Error("Failed to Add Crawl Data: %s", err.Error())
 			return true
 		}
-		filePath := "./data/crawl_data/" + dataID + ".txt"
+		filePath := utils.GetCrawlFilePath(datasource, dataID, "txt")
 		err = os.WriteFile(filePath, []byte(d.ctx.contentBuilder.Text()), os.ModePerm)
 		if err != nil {
 			logger.Error("Failed to write file: %s; Reason: %s", filePath, err.Error())

@@ -11,9 +11,12 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/pluja/pocketbase v0.1.0
 	github.com/robfig/cron/v3 v3.0.1
-	github.com/sashabaranov/go-openai v1.36.1
+	github.com/sashabaranov/go-openai v1.0.0
 )
 
+replace (
+	github.com/sashabaranov/go-openai => github.com/Yikuni/go-openai v1.0.0
+)
 require (
 	github.com/PuerkitoBio/goquery v1.5.1 // indirect
 	github.com/SierraSoftworks/multicast/v2 v2.0.0 // indirect
