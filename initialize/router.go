@@ -35,6 +35,7 @@ func Routers() *gin.Engine {
 	publicGroup := r.Group("/public")
 
 	AdminGroup.Use(middleware.Auth())
+	AdminGroup.Use(middleware.DefaultErrorHandler())
 
 	if global.Config.Server.Debug {
 		testGroup := r.Group("/test")
