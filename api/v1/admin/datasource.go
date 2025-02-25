@@ -31,8 +31,7 @@ func (a *DatasourceAPI) ActivateDatasource(c *gin.Context) {
 
 	// 上传文件或者删除文件，并更改vector store
 	var fileList []string
-	_ = datasourceService.TraverseAllFiles(datasource, func(e adminRes.UploadFileEntity) error {
-		shouldUpdateFileState := true
+	_ = datasourceService.TraverseAllFiles(datasource, func(e *adminRes.UploadFileEntity) (error, bool) {
 		if e.FileID != "" {
 			if e.Deleted {
 				// 删除文件
@@ -40,34 +39,23 @@ func (a *DatasourceAPI) ActivateDatasource(c *gin.Context) {
 				if err != nil {
 					e.FileID = ""
 				}
-				return err
+				return err, false
 			} else {
 				// 已经上传过并且没删除
 				fileList = append(fileList, e.FileID)
-				shouldUpdateFileState = false
-				return nil
+				return nil, false
 			}
 		} else {
 			// 如果文件没上传过
 			fileID, err := assistantService.UploadFile(e.Path, getFileName(datasourceID, e.ID))
 			// 更新fileID
 			if err != nil {
-				return err
+				return err, false
 			}
 			fileList = append(fileList, fileID)
 			e.FileID = fileID
 		}
-
-		if !shouldUpdateFileState {
-			return nil
-		}
-		// 上传后更新数据库文件状态
-		if datasource.Crawl {
-			datasourceService.UpdateCrawlFile(&e)
-		} else {
-			datasourceService.UpdateDataFile(&e)
-		}
-		return nil
+		return nil, true
 	})
 	// 创建vector store
 	store, _ := assistantService.CreateVectorStore(getVectorStoreName(datasourceID), fileList)
