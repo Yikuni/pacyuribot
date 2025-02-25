@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/pluja/pocketbase"
 	"pacyuribot/global"
+	"pacyuribot/logger"
 	adminRes "pacyuribot/model/admin/response"
 	"pacyuribot/model/common/response"
 )
@@ -27,11 +28,13 @@ func (a *DatasourceAPI) ActivateDatasource(c *gin.Context) {
 	}
 
 	// 获取datasource下的所有文件
-	datasource, _ := datasourceService.GetDatasource(datasourceID, userID)
-
+	datasource, err := datasourceService.GetDatasource(datasourceID, userID)
+	if err != nil {
+		panic(err)
+	}
 	// 上传文件或者删除文件，并更改vector store
 	var fileList []string
-	_ = datasourceService.TraverseAllFiles(datasource, func(e *adminRes.UploadFileEntity) (error, bool) {
+	err = datasourceService.TraverseAllFiles(datasource, func(e *adminRes.UploadFileEntity) (error, bool) {
 		if e.FileID != "" {
 			if e.Deleted {
 				// 删除文件
@@ -50,6 +53,7 @@ func (a *DatasourceAPI) ActivateDatasource(c *gin.Context) {
 			fileID, err := assistantService.UploadFile(e.Path, getFileName(datasourceID, e.ID))
 			// 更新fileID
 			if err != nil {
+				logger.Error(err.Error())
 				return err, false
 			}
 			fileList = append(fileList, fileID)
@@ -57,12 +61,31 @@ func (a *DatasourceAPI) ActivateDatasource(c *gin.Context) {
 		}
 		return nil, true
 	})
+	if err != nil {
+		panic(err)
+	}
+	// 删除旧的vector store
+	if datasource.VectorStore != "" {
+		err = assistantService.DeleteVectorStore(datasource.VectorStore)
+		if err != nil {
+			panic(err)
+		}
+	}
 	// 创建vector store
-	store, _ := assistantService.CreateVectorStore(getVectorStoreName(datasourceID), fileList)
+	store, err := assistantService.CreateVectorStore(getVectorStoreName(datasourceID), fileList)
+	if err != nil {
+		panic(err)
+	}
 	// 将vector store id保存到datasource实体中
 	datasource.VectorStore = store
-	_ = datasourceService.UpdateDatasource(datasource)
-	_ = updateAssistant(datasource)
+	err = datasourceService.UpdateDatasource(datasource)
+	if err != nil {
+		panic(err)
+	}
+	err = updateAssistant(datasource)
+	if err != nil {
+		panic(err)
+	}
 	response.Ok(c)
 }
 
@@ -95,7 +118,7 @@ func getFileName(datasourceID string, file string) string {
 
 func updateAssistant(datasource *adminRes.Datasource) error {
 	// 获取model
-	model, err := pocketbase.CollectionSet[adminRes.Model](global.PocketbaseAdminClient, "model").
+	model, err := pocketbase.CollectionSet[adminRes.Model](global.PocketbaseAdminClient, "models").
 		One(datasource.Model)
 	if err != nil {
 		return err

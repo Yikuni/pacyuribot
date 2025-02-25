@@ -108,7 +108,7 @@ func (s *DatasourceService) GetAllVectorStore(model *response.Model) ([]string, 
 		List(pocketbase.ParamsList{
 			Page:    1,
 			Size:    32767,
-			Filters: fmt.Sprintf("deleted=false && model=%s && vector_store!=''", model.ID),
+			Filters: fmt.Sprintf("deleted=false && model='%s' && vector_store!=''", model.ID),
 			Sort:    "",
 			Expand:  "",
 			Fields:  "",
@@ -125,7 +125,7 @@ func (s *DatasourceService) GetAllVectorStore(model *response.Model) ([]string, 
 
 func (s *DatasourceService) UpdateModel(model *response.Model) error {
 	return pocketbase.
-		CollectionSet[response.Model](global.PocketbaseAdminClient, "model").
+		CollectionSet[response.Model](global.PocketbaseAdminClient, "models").
 		Update(model.ID, *model)
 }
 
