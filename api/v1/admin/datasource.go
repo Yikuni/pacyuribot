@@ -68,6 +68,7 @@ func (a *DatasourceAPI) ActivateDatasource(c *gin.Context) {
 
 // DeactivateDatasource
 // @Summary 删除或禁用datasource后需要删除vector_store
+// @Router	/admin/datasource/deactivate
 func (a *DatasourceAPI) DeactivateDatasource(c *gin.Context) {
 	datasourceID, b := c.GetQuery("datasource")
 	userID := c.GetString("userID")

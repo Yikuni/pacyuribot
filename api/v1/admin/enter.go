@@ -7,6 +7,7 @@ import (
 
 type APIGroup struct {
 	CrawlerAPI
+	DatasourceAPI
 }
 
 var (
