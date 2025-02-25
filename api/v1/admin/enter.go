@@ -10,6 +10,7 @@ type APIGroup struct {
 }
 
 var (
-	crawlerService                              = service.ServiceGroupApp.AdminServiceGroup.CrawlerService
-	assistantService assistant.AssistantService = &(service.ServiceGroupApp.AssistantServiceGroup.ChatGPTService)
+	crawlerService                               = service.ServiceGroupApp.AdminServiceGroup.CrawlerService
+	assistantService  assistant.AssistantService = &(service.ServiceGroupApp.AssistantServiceGroup.ChatGPTService)
+	datasourceService                            = service.ServiceGroupApp.AdminServiceGroup.DatasourceService
 )
