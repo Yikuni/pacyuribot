@@ -2,12 +2,43 @@ package assistant
 
 import (
 	"context"
+	"errors"
 	"github.com/sashabaranov/go-openai"
+	"io"
 	"pacyuribot/global"
 	"pacyuribot/utils"
 )
 
 type ChatGPTService struct {
+}
+
+func (c *ChatGPTService) Chat(assistantID string,
+	messages []openai.ThreadMessage, onMessage ChatMessageCallback, onFinish ChatFinishCallback) {
+
+	stream, err := utils.GetChatGPTClient().
+		CreateThreadAndStream(context.Background(), openai.CreateThreadAndRunRequest{
+			RunRequest: openai.RunRequest{
+				AssistantID: assistantID,
+			},
+			Thread: openai.ThreadRequest{
+				Messages: messages,
+			},
+		})
+	if err != nil {
+		panic(err)
+	}
+	defer stream.Close()
+
+	for {
+		resp, err := stream.Recv()
+		if err != nil {
+			onMessage(resp)
+		}
+		if errors.Is(err, io.EOF) {
+			onFinish()
+			break
+		}
+	}
 }
 
 // CreateAssistant
