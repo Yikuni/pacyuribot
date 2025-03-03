@@ -22,7 +22,7 @@ func Routers() *gin.Engine {
 	r.Static("/data/crawl_data", "./data/crawl_data")
 
 	AdminGroup := r.Group("/admin")
-	//UserGroup := r.Group("/user")
+	UserGroup := r.Group("/user")
 	publicGroup := r.Group("/public")
 
 	AdminGroup.Use(middleware.Auth())
@@ -39,6 +39,10 @@ func Routers() *gin.Engine {
 	adminRouter := router.RouterGroupApp.Admin
 	adminRouter.InitCrawlerRouter(AdminGroup)
 	adminRouter.InitialDatasourceRouter(AdminGroup)
+
+	// user router init
+	userRouter := router.RouterGroupApp.User
+	userRouter.InitializeChatRouter(UserGroup)
 	// 健康监测
 	publicGroup.GET("/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, "ok")

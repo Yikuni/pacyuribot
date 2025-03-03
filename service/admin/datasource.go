@@ -15,6 +15,16 @@ type DatasourceService struct {
 }
 type FileOperation func(entity *response.UploadFileEntity) (error, bool)
 
+func (s *DatasourceService) GetModel(id string, userID string) (*response.Model, error) {
+	model, err := pocketbase.CollectionSet[response.Model](global.PocketbaseAdminClient, "models").One(id)
+	if err != nil {
+		return nil, err
+	}
+	if !strings.EqualFold(model.Owner, userID) {
+		return nil, fmt.Errorf("failed to find model: %s", id)
+	}
+	return &model, nil
+}
 func (s *DatasourceService) GetDatasource(id string, userID string) (*response.Datasource, error) {
 	datasource, err := pocketbase.
 		CollectionSet[response.Datasource](global.PocketbaseAdminClient, "data_source").One(id)

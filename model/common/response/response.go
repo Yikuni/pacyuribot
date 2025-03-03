@@ -19,6 +19,14 @@ const (
 
 func Result(code int, data interface{}, msg string, c *gin.Context) {
 	// 开始时间
+	if code == ERROR {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, Response{
+			Code: code,
+			Data: data,
+			Msg:  msg,
+		})
+		return
+	}
 	c.JSON(http.StatusOK, Response{
 		code,
 		data,
