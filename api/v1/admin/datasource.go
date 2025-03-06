@@ -26,67 +26,73 @@ func (a *DatasourceAPI) ActivateDatasource(c *gin.Context) {
 		response.InvalidRequestFormat(c)
 		return
 	}
-
-	// 获取datasource下的所有文件
-	datasource, err := datasourceService.GetDatasource(datasourceID, userID)
-	if err != nil {
-		panic(err)
-	}
-	// 上传文件或者删除文件，并更改vector store
-	var fileList []string
-	err = datasourceService.TraverseAllFiles(datasource, func(e *adminRes.UploadFileEntity) (error, bool) {
-		if e.FileID != "" {
-			if e.Deleted {
-				// 删除文件
-				err := assistantService.DeleteFile(e.FileID)
-				if err != nil {
-					e.FileID = ""
+	response.Ok(c)
+	go func() {
+		// 获取datasource下的所有文件
+		datasource, err := datasourceService.GetDatasource(datasourceID, userID)
+		if err != nil {
+			logger.Error(err.Error())
+			return
+		}
+		// 上传文件或者删除文件，并更改vector store
+		var fileList []string
+		err = datasourceService.TraverseAllFiles(datasource, func(e *adminRes.UploadFileEntity) (error, bool) {
+			if e.FileID != "" {
+				if e.Deleted {
+					// 删除文件
+					err := assistantService.DeleteFile(e.FileID)
+					if err != nil {
+						e.FileID = ""
+					}
+					return err, false
+				} else {
+					// 已经上传过并且没删除
+					fileList = append(fileList, e.FileID)
+					return nil, false
 				}
-				return err, false
 			} else {
-				// 已经上传过并且没删除
-				fileList = append(fileList, e.FileID)
-				return nil, false
+				// 如果文件没上传过
+				fileID, err := assistantService.UploadFile(e.Path, getFileName(datasourceID, e.ID))
+				// 更新fileID
+				if err != nil {
+					logger.Error(err.Error())
+					return err, false
+				}
+				fileList = append(fileList, fileID)
+				e.FileID = fileID
 			}
-		} else {
-			// 如果文件没上传过
-			fileID, err := assistantService.UploadFile(e.Path, getFileName(datasourceID, e.ID))
-			// 更新fileID
+			return nil, true
+		})
+		if err != nil {
+			logger.Error(err.Error())
+		}
+		// 删除旧的vector store
+		if datasource.VectorStore != "" {
+			err = assistantService.DeleteVectorStore(datasource.VectorStore)
 			if err != nil {
 				logger.Error(err.Error())
-				return err, false
+				return
 			}
-			fileList = append(fileList, fileID)
-			e.FileID = fileID
 		}
-		return nil, true
-	})
-	if err != nil {
-		panic(err)
-	}
-	// 删除旧的vector store
-	if datasource.VectorStore != "" {
-		err = assistantService.DeleteVectorStore(datasource.VectorStore)
+		// 创建vector store
+		store, err := assistantService.CreateVectorStore(getVectorStoreName(datasourceID), fileList)
 		if err != nil {
-			panic(err)
+			logger.Error(err.Error())
+			return
 		}
-	}
-	// 创建vector store
-	store, err := assistantService.CreateVectorStore(getVectorStoreName(datasourceID), fileList)
-	if err != nil {
-		panic(err)
-	}
-	// 将vector store id保存到datasource实体中
-	datasource.VectorStore = store
-	err = datasourceService.UpdateDatasource(datasource)
-	if err != nil {
-		panic(err)
-	}
-	err = updateAssistant(datasource)
-	if err != nil {
-		panic(err)
-	}
-	response.Ok(c)
+		// 将vector store id保存到datasource实体中
+		datasource.VectorStore = store
+		err = datasourceService.UpdateDatasource(datasource)
+		if err != nil {
+			logger.Error(err.Error())
+			return
+		}
+		err = updateAssistant(datasource)
+		if err != nil {
+			logger.Error(err.Error())
+			return
+		}
+	}()
 }
 
 // DeactivateDatasource
@@ -99,13 +105,14 @@ func (a *DatasourceAPI) DeactivateDatasource(c *gin.Context) {
 		response.InvalidRequestFormat(c)
 		return
 	}
-	// 仅删除vector store，不删除相关文件
-	datasource, _ := datasourceService.GetDatasource(datasourceID, userID)
-	_ = assistantService.DeleteVectorStore(datasource.VectorStore)
-	datasource.VectorStore = ""
-	_ = datasourceService.UpdateDatasource(datasource)
-
 	response.Ok(c)
+	go func() {
+		// 仅删除vector store，不删除相关文件
+		datasource, _ := datasourceService.GetDatasource(datasourceID, userID)
+		_ = assistantService.DeleteVectorStore(datasource.VectorStore)
+		datasource.VectorStore = ""
+		_ = datasourceService.UpdateDatasource(datasource)
+	}()
 }
 
 func getVectorStoreName(datasourceID string) string {
