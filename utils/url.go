@@ -3,13 +3,18 @@ package utils
 import (
 	"fmt"
 	"net/url"
+	"strings"
 )
 
 // CompleteURL 补全URL，返回完整的URL
 func CompleteURL(inputURL string, baseURL *url.URL) (*url.URL, error) {
 	// 如果是 # 开头的锚点，直接返回空字符串
-	if len(inputURL) > 0 && inputURL[0] == '#' {
+	if len(inputURL) > 0 && inputURL[0] == '#' && inputURL[1] != '/' {
 		return nil, nil
+	}
+	if !strings.HasPrefix(inputURL, "http://") || !strings.HasPrefix(inputURL, "https://") {
+		resolvedURL := baseURL.JoinPath(inputURL)
+		return resolvedURL, nil
 	}
 
 	// 解析 inputURL
