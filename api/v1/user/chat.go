@@ -29,6 +29,8 @@ func (a *ChatAPI) Completions(c *gin.Context) {
 			func(event openai.AssistantStreamEvent) {
 				if len(event.Content) > 0 {
 					w.Write([]byte(event.Content[0].Text.Value))
+					ginW := w.(gin.ResponseWriter)
+					ginW.Flush()
 				}
 			}, func() {
 				//logger.Debug("finish")
