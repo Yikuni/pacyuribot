@@ -179,7 +179,7 @@ func (d *DefaultCrawler) Run() {
 	// 加上外链
 	d.C.OnHTML("a", func(element *colly.HTMLElement) {
 		href := element.Attr("href")
-		targetURL, _ := utils.CompleteURL(href, element.Request.URL)
+		targetURL, _ := utils.CompleteURL(href, d.ctx.currentURL)
 		if targetURL != nil {
 			blocked := false
 			for f := d.urlFilterList.Front(); f != nil && !blocked; f = f.Next() {
