@@ -125,12 +125,16 @@ func (c *ChatGPTService) DeleteFile(fileID string) error {
 
 func (c *ChatGPTService) CreateVectorStore(name string, fileIDList []string) (string, error) {
 	cli := utils.GetChatGPTClient()
+	expireDays := 365
+	if global.Config.Server.Debug {
+		expireDays = 3
+	}
 	store, err := cli.CreateVectorStore(context.Background(), openai.VectorStoreRequest{
 		Name:    name,
 		FileIDs: fileIDList,
 		ExpiresAfter: &openai.VectorStoreExpires{
 			Anchor: "last_active_at",
-			Days:   3,
+			Days:   expireDays,
 		},
 		Metadata: nil,
 	})
