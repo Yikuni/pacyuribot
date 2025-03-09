@@ -8,6 +8,7 @@ func GetDefaultCrawler(config request.DefaultCrawlerConfig, userID string, datas
 		AddContentFilter(GetTitleFilter(config.MaxLengthC, config.MaxLengthE), 8).
 		AddContentFilter(TrimFilter, 10).
 		AddPageCrawledCallback(GetSmallFileFilter(config.MinPageContentLength), 1).
+		AddPageCrawledCallback(GetContentHashFilter(), 2).
 		AddPageCrawledCallback(GetAddCrawlDataCallback(userID, datasourceID), 8).
 		AddUrlFilter(GetDomainFilter(config.AllowExternalLink), 9).
 		AddUrlFilter(GetMaxDepthFilter(config.MaxDepth), 10).

@@ -1,6 +1,8 @@
 package crawler
 
 import (
+	"container/list"
+	"hash/fnv"
 	"os"
 	"pacyuribot/logger"
 	"pacyuribot/service"
@@ -44,6 +46,24 @@ func GetSmallFileFilter(minLen int) PageCrawledCallback {
 			logger.Debug("Filtered page: %s; Reason: content is too short", d.ctx.currentURL)
 			return true
 		}
+		return false
+	}
+}
+
+func GetContentHashFilter() PageCrawledCallback {
+	hashList := list.New()
+	return func(d *DefaultCrawler) bool {
+		h := fnv.New64a()
+		h.Write([]byte(d.ctx.contentBuilder.Text()))
+		strHash := h.Sum64()
+		for e := hashList.Front(); e != nil; e = e.Next() {
+			b := e.Value.(uint64)
+			if b == strHash {
+				logger.Debug("Filtered page: %s; Reason: 重复内容", d.ctx.currentURL)
+				return true
+			}
+		}
+		hashList.PushBack(strHash)
 		return false
 	}
 }
