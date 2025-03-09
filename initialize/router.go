@@ -12,6 +12,7 @@ import (
 
 func Routers() *gin.Engine {
 	r := gin.Default()
+	r.Use(middleware.Cors())
 
 	// 保证./data/crawl_data文件夹存在
 	utils.Mkdir("./data/crawl_data")

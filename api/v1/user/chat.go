@@ -1,7 +1,6 @@
 package user
 
 import (
-	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/sashabaranov/go-openai"
 	"io"
@@ -12,32 +11,30 @@ type ChatAPI struct {
 }
 
 // Completions
-// @Summary 流式对话，接口和chatgpt几乎相同
-// @Router /user/chat/completions/:userID
+// @Summary 流式对话，请求格式和chatgpt相同，但响应格式为纯文本
+// @Router /user/chat/threads/runs
 func (a *ChatAPI) Completions(c *gin.Context) {
 	// 设置流式响应
-	c.Header("Content-Type", "application/json; charset=utf-8")
+	c.Header("Content-Type", "text/event-stream; charset=utf-8")
 	c.Header("Transfer-Encoding", "chunked")
 
 	var req openai.CreateThreadAndStreamRequest
-	err := c.ShouldBindJSON(req)
+	err := c.ShouldBindJSON(&req)
 	if err != nil {
 		response.InvalidRequestFormat(c)
 		return
 	}
-	assistantService.Chat(req.AssistantID, req.CreateThreadAndRunRequest.Thread.Messages,
-		func(event openai.AssistantStreamEvent) {
-			jsonBytes, err := json.Marshal(event)
-			if err != nil {
-				response.InvalidRequestFormat(c)
-				return
-			}
-			c.Stream(func(w io.Writer) bool {
-				w.Write(jsonBytes)
-				w.Write([]byte("\n\n"))
-				return true
+	c.Stream(func(w io.Writer) bool {
+		assistantService.Chat(req.AssistantID, req.CreateThreadAndRunRequest.Thread.Messages,
+			func(event openai.AssistantStreamEvent) {
+				if len(event.Content) > 0 {
+					w.Write([]byte(event.Content[0].Text.Value))
+				}
+			}, func() {
+				//logger.Debug("finish")
+				// TODO save the conversation
 			})
-		}, func() {
-			response.Ok(c)
-		})
+
+		return false
+	})
 }

@@ -31,14 +31,15 @@ func (c *ChatGPTService) Chat(assistantID string,
 
 	for {
 		resp, err := stream.Recv()
-		if err != nil {
-			onMessage(resp)
-		}
 		if errors.Is(err, io.EOF) {
-			onFinish()
 			break
+		} else if err != nil {
+			panic(err)
 		}
+		onMessage(resp)
 	}
+	onFinish()
+
 }
 
 // CreateAssistant

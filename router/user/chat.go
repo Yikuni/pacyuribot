@@ -7,5 +7,5 @@ type ChatRouter struct {
 
 func (c *ChatRouter) InitializeChatRouter(rGroup *gin.RouterGroup) {
 	r := rGroup.Group("chat")
-	r.POST("completion/:userID", chatAPI.Completions)
+	r.POST("threads/runs", chatAPI.Completions)
 }
